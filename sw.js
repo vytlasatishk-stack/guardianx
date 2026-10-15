@@ -1,5 +1,5 @@
 // GuardianX service worker: keeps the app shell available offline.
-const CACHE = 'gx-shell-200';
+const CACHE = 'gx-shell-201';
 self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => {
   self.clients.claim();

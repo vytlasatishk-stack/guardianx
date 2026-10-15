@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0b1f4d">
 <title>GuardianX</title>
 <script>
-window.GX_VER='200';
+window.GX_VER='201';
 window.addEventListener('error',function(e){try{if(e&&e.target&&e.target!==window&&e.target!==document&&(e.target.tagName||e.target.nodeName))return;var _m=(e&&e.message)?String(e.message):'';if(!_m||/^script error/i.test(_m))return;var b=document.getElementById('gxerr');if(!b){b=document.createElement('div');b.id='gxerr';(document.body||document.documentElement).appendChild(b);}b.setAttribute('style','position:fixed;left:8px;right:8px;bottom:8px;z-index:99999;background:#dc2626;color:#fff;font:12.5px/1.45 -apple-system,system-ui,sans-serif;padding:11px 13px;border-radius:11px;box-shadow:0 8px 24px rgba(0,0,0,.35);white-space:pre-wrap;max-height:46vh;overflow:auto');b.textContent='\u26a0\ufe0f '+_m+(e.lineno?(' (line '+e.lineno+')'):'')+'  \u2014 tap to dismiss';b.onclick=function(){b.remove();};}catch(_){}},true);
 window.addEventListener('unhandledrejection',function(e){try{console.error('promise:',e.reason);}catch(_){}});
 </script>
@@ -627,6 +627,32 @@ table.rep th{ position:sticky; top:0; background:color-mix(in srgb,var(--card) 9
 .rolechip{ background:linear-gradient(135deg,rgba(96,165,250,.28),rgba(167,139,250,.22)) !important; border:1px solid rgba(186,230,253,.45) !important;
   box-shadow:0 0 14px rgba(96,165,250,.28),inset 0 1px 0 rgba(255,255,255,.18); font-weight:700; letter-spacing:.3px; backdrop-filter:blur(6px) }
 @media (prefers-reduced-motion:reduce){ .gxNetBanner,.gxNetBanner::before{ animation:none !important } }
+
+/* ==========================================================
+   BUILD 201 — "Liquid switch" toggle system
+   One switch component for every on/off control: spring knob,
+   gradient track with glow, state-aware labels, focus rings,
+   checkbox restyle, reduced-motion fallback.
+   ========================================================== */
+.gxSw{ --w:52px; --h:30px; --pad:3px; position:relative; flex:0 0 auto; width:var(--w); height:var(--h); border-radius:999px; border:1px solid color-mix(in srgb,var(--muted) 35%,transparent); background:linear-gradient(180deg,color-mix(in srgb,var(--muted) 22%,transparent),color-mix(in srgb,var(--muted) 12%,transparent)); box-shadow:inset 0 2px 6px rgba(2,8,40,.18); cursor:pointer; padding:0; transition:background .35s var(--gx-ease),box-shadow .35s,border-color .35s; -webkit-tap-highlight-color:transparent }
+.gxSwKnob{ position:absolute; top:var(--pad); left:var(--pad); width:calc(var(--h) - 2*var(--pad) - 2px); height:calc(var(--h) - 2*var(--pad) - 2px); border-radius:50%; background:#fff; box-shadow:0 2px 6px rgba(2,8,40,.3),0 0 0 .5px rgba(2,8,40,.06); transition:transform .45s cubic-bezier(.34,1.56,.64,1),width .2s; }
+.gxSw:active .gxSwKnob{ width:calc(var(--h) + 6px) }
+.gxSw.on{ background:linear-gradient(135deg,#22d3ee,#3b82f6 55%,#7c3aed); border-color:rgba(125,211,252,.6); box-shadow:0 0 0 1px rgba(255,255,255,.08) inset,0 0 18px -2px rgba(59,130,246,.65) }
+.gxSw.on .gxSwKnob{ transform:translateX(calc(var(--w) - var(--h))) }
+.gxSw.on:active .gxSwKnob{ transform:translateX(calc(var(--w) - var(--h) - 6px)) }
+.gxSw:focus-visible{ outline:none; box-shadow:0 0 0 4px var(--gx-glow) }
+.gxSwRow,.gxSwBtn{ display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; padding:10px 12px; margin:6px 0; border-radius:14px; background:color-mix(in srgb,var(--card) 70%,transparent); border:1px solid var(--gx-edge); cursor:pointer; font-weight:650; color:var(--text); text-align:left; font-size:14px }
+.gxSwBtn{ border:1px solid var(--gx-edge) }
+.gxSwTxt{ flex:1; min-width:0 }
+.chiprow .gxSwRow{ width:auto; flex:1 1 210px; margin:0 }
+/* checkboxes (bulk select) as rounded gradient ticks */
+input[type="checkbox"]{ appearance:none; -webkit-appearance:none; width:20px; height:20px; border-radius:7px; border:1.5px solid color-mix(in srgb,var(--muted) 55%,transparent); background:color-mix(in srgb,var(--card) 90%,transparent); display:inline-grid; place-content:center; cursor:pointer; transition:background .25s,border-color .25s,transform .2s var(--gx-ease),box-shadow .25s; flex:0 0 auto; margin:0 }
+input[type="checkbox"]::before{ content:""; width:10px; height:10px; transform:scale(0); transition:transform .3s cubic-bezier(.34,1.56,.64,1); clip-path:polygon(14% 44%,0 65%,50% 100%,100% 16%,80% 0,43% 62%); background:#fff }
+input[type="checkbox"]:checked{ background:linear-gradient(135deg,#22d3ee,#3b82f6 60%,#7c3aed); border-color:transparent; box-shadow:0 0 12px -2px rgba(59,130,246,.6) }
+input[type="checkbox"]:checked::before{ transform:scale(1) }
+input[type="checkbox"]:active{ transform:scale(.9) }
+input[type="checkbox"]:focus-visible{ outline:none; box-shadow:0 0 0 4px var(--gx-glow) }
+@media (prefers-reduced-motion:reduce){ .gxSwKnob,.gxSw,input[type="checkbox"],input[type="checkbox"]::before{ transition:none !important } }
 </style>
 </head>
 <body>
@@ -2082,7 +2108,7 @@ function vEmployees(m){
   if(_h1){ var _sw=el('div','field'); _sw.style.margin='10px 0'; _sw.innerHTML='<input id="emp_search" placeholder="\ud83d\udd0d Search by name, ID, department, bus, or route" value="'+esc(window.__empSearch||'')+'" autocomplete="off">'; _h1.after(_sw);
     var _si=_sw.querySelector('#emp_search'); _si.oninput=function(){ window.__empSearch=this.value; render(); }; _si.focus(); _si.selectionStart=_si.selectionEnd=_si.value.length; }
   if(canEdit()){ var _rb=m.querySelector('.rowbtns'); if(_rb){ var _bb=el('button','btn sm','\ud83d\udccb Bulk add / import'); _bb.onclick=bulkEmpFlow; _rb.appendChild(_bb);
-    var _dm=el('button', window.__empDelMode?'btn sm danger':'btn sm ghost', window.__empDelMode?'🗑️ Delete mode: ON':'🗑️ Delete mode: OFF');
+    var _dm=el('button','gxSwBtn'); _dm.innerHTML='<span class="gxSwTxt">🗑️ Delete mode</span>'+gxSw(!!window.__empDelMode,'','Delete mode');
     _dm.onclick=function(){ window.__empDelMode=!window.__empDelMode; if(!window.__empDelMode) window.__empSel={}; toast(window.__empDelMode?'Delete mode ON — tap Del on a row to remove it':'Delete mode OFF'); render(); };
     _rb.appendChild(_dm);
     if(window.__empDelMode){
@@ -3641,7 +3667,7 @@ function vAssistant(m){
   var chips=langs.map(function(l){return '<button class="btn sm'+(gxLang()===l?'':' ghost')+'" type="button" onclick="gxSetLang(\''+l+'\')">'+GX_LANGS[l].name+'</button>';}).join('');
   var von=window.__axVoice!==false;
   m.innerHTML='<div class="h1">\ud83e\udd16 GX Assistant</div><div class="sub">Your voice companion \u2014 ask about your bus, in English, \u0c24\u0c46\u0c32\u0c41\u0c17\u0c41 or \u0939\u093f\u0902\u0926\u0940</div>'+
-    '<div class="chiprow">'+chips+'<button class="btn sm'+(von?'':' ghost')+'" type="button" onclick="gxVoiceToggle()">\ud83d\udd0a Voice '+(von?'on':'off')+'</button><button class="btn sm'+((S.settings&&S.settings.autoVol)?'':' ghost')+'" type="button" onclick="gxAutoVolToggle()">\ud83d\udd08 Auto-volume</button></div>'+
+    '<div class="chiprow">'+chips+''+gxSwRow('\ud83d\udd0a Voice replies',von,'onclick="gxVoiceToggle()"')+gxSwRow('\ud83d\udd08 Auto-volume',!!(S.settings&&S.settings.autoVol),'onclick="gxAutoVolToggle()"')+'</div>'+
     '<div class="chiprow"><button class="btn ghost sm" type="button" onclick="gxTestVoice(\'female\')">\u2640 Preview female</button><button class="btn ghost sm" type="button" onclick="gxTestVoice(\'male\')">\u2642 Preview male</button><button class="btn ghost sm" type="button" onclick="gxTestAlert()">\ud83d\udd14 Test alert (sound+vibrate)</button></div>'+
     '<div class="sub" style="margin:10px 0 4px">Stop-alert sound</div>'+
     '<div class="chiprow"><button class="btn sm'+(((S.settings&&S.settings.stopSound)||'chime')==='chime'?'':' ghost')+'" type="button" onclick="gxStopSoundSet(\'chime\')">\ud83c\udfb5 Chime</button><button class="btn sm'+((S.settings&&S.settings.stopSound)==='buzzer'?'':' ghost')+'" type="button" onclick="gxStopSoundSet(\'buzzer\')">\ud83d\udd14 Buzzer</button><button class="btn sm'+((S.settings&&S.settings.stopSound)==='off'?'':' ghost')+'" type="button" onclick="gxStopSoundSet(\'off\')">\ud83d\udd07 Off (voice only)</button><button class="btn ghost sm" type="button" onclick="((S.settings&&S.settings.stopSound)||\'chime\')===\'buzzer\'?buzzer():gxChime()">\u25b6\ufe0f Preview</button></div>'+
@@ -3665,6 +3691,14 @@ window.gxVoiceGender=function(g){ S.settings.voiceGender=g; save(); render(); to
 window.__noiseVol=1;
 function gxNoiseStart(){ if(window.__noiseStream) return; try{ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia) return; navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){ window.__noiseStream=stream; var Ctx=window.AudioContext||window.webkitAudioContext; var ctx=new Ctx(); var src=ctx.createMediaStreamSource(stream); var an=ctx.createAnalyser(); an.fftSize=512; src.connect(an); var data=new Uint8Array(an.frequencyBinCount); window.__noiseCtx=ctx; window.__noiseTimer=setInterval(function(){ an.getByteFrequencyData(data); var sum=0; for(var i=0;i<data.length;i++) sum+=data[i]; var avg=sum/data.length; window.__noiseVol=Math.min(1,Math.max(0.65,0.62+avg/170)); },500); }).catch(function(){ window.__noiseVol=1; toast(typeof GX_MIC_BLOCKED_MSG!=='undefined'?GX_MIC_BLOCKED_MSG:'Microphone permission is needed for auto-volume.'); }); }catch(e){} }
 function gxNoiseStop(){ try{ if(window.__noiseTimer){ clearInterval(window.__noiseTimer); window.__noiseTimer=null; } if(window.__noiseCtx){ try{window.__noiseCtx.close();}catch(_c){} window.__noiseCtx=null; } if(window.__noiseStream){ window.__noiseStream.getTracks().forEach(function(t){t.stop();}); } }catch(e){} window.__noiseStream=null; window.__noiseVol=1; }
+/* ===== Build 201: switch component used by every on/off control ===== */
+window.gxSw=function(on,attrs,label){
+  var sw='<button type="button" class="gxSw'+(on?' on':'')+'" role="switch" aria-checked="'+(on?'true':'false')+'" '+(attrs||'')+(label?' aria-label="'+esc(label)+'"':'')+'><span class="gxSwKnob"></span></button>';
+  return sw;
+};
+window.gxSwRow=function(label,on,attrs){
+  return '<label class="gxSwRow"><span class="gxSwTxt">'+label+'</span>'+gxSw(on,attrs,label)+'</label>';
+};
 window.gxAutoVolToggle=function(){ S.settings.autoVol=!(S.settings&&S.settings.autoVol); if(S.settings.autoVol){ gxNoiseStart(); toast('\ud83d\udd0a Auto-volume on \u2014 please allow microphone'); } else { gxNoiseStop(); toast('Auto-volume off'); } save(); render(); };
 window.gxAnnounceMsg=function(){ var t=(val('dan_msg')||'').trim(); if(!t){ toast('Type a message'); return; } gxSpeak(t); toast('\ud83d\udce2 Announced'); };
 window.gxVoiceToggle=function(){ window.__axVoice=(window.__axVoice===false); render(); };
@@ -4220,7 +4254,7 @@ function vWomenSafety(m){
   h+=(e&&e.emergency?('<div class="card" style="margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><div style="font-weight:800">\ud83c\udd98 My emergency contact</div><div class="sub" style="margin:2px 0 0">'+esc(e.emergency)+' \u2014 from your employee record. PANIC alerts this number first.</div></div><a class="btn sm" href="tel:'+esc(e.emergency)+'">\ud83d\udcde Call</a></div></div>'):'<div class="sub" style="margin:10px 0 0">\ud83c\udd98 No emergency contact on your record yet \u2014 ask HR / admin to add one in Employees.</div>');
   h+='<div class="rowbtns" style="margin-top:8px"><button class="btn sm ghost" type="button" onclick="gxSafeArrived()">\u2705 I reached safely</button><button class="btn sm ghost" type="button" onclick="runningLate()">\u23f0 Running late</button></div>';
   var nm=!!(S.settings&&S.settings.nightMode), hh=new Date().getHours();
-  h+='<div class="card" style="margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><div style="font-weight:800">\ud83c\udf19 Night-travel mode</div><div class="sub" style="margin:2px 0 0">Extra safety prompts for late trips</div></div><button class="btn sm'+(nm?'':' ghost')+'" type="button" onclick="gxNightToggle()">'+(nm?'On':'Off')+'</button></div>'+
+  h+='<div class="card" style="margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><div style="font-weight:800">\ud83c\udf19 Night-travel mode</div><div class="sub" style="margin:2px 0 0">Extra safety prompts for late trips</div></div>'+gxSw(nm,'onclick="gxNightToggle()"','Night-travel mode')+'</div>'+
     ((nm&&(hh>=20||hh<6))?'<div style="margin-top:8px;background:#fce7f3;color:#9d174d;border-radius:10px;padding:8px 10px;font-size:13px;font-weight:700">\ud83c\udf19 You are travelling at night. Share your live location with family and tap \u201cI reached safely\u201d when you get home.</div>':'')+'</div>';
   h+='<div class="sectiontitle" style="margin-top:14px">Trusted family contacts</div><div class="sub" style="margin:0 0 8px">Saved on this phone. One tap shares your live location by WhatsApp.</div>';
   if(!tc.length) h+='<div class="sub">None yet \u2014 add one below.</div>';
@@ -4746,8 +4780,8 @@ function vSettings(m){
   m.appendChild(comp);
 
   const appc=el('div','card'); appc.innerHTML=`<h3>Appearance</h3>`;
-  const dk=el('div','rowbtns'); const dkb=el('button','btn ghost sm',(S.settings.dark?'☀️ Light mode':'🌙 Dark mode'));
-  dkb.onclick=()=>{S.settings.dark=!S.settings.dark;save();applyTheme();render();}; dk.appendChild(dkb);
+  const dk=el('div','gxSwBtn'); dk.innerHTML='<span class="gxSwTxt">🌙 Dark mode</span>'+gxSw(!!S.settings.dark,'','Dark mode');
+  dk.onclick=()=>{S.settings.dark=!S.settings.dark;save();applyTheme();render();};
   const lang=el('div','field'); lang.innerHTML=`<label>Language</label><select id="set_lang">${['English','हिन्दी','తెలుగు'].map(l=>`<option ${S.settings.lang===l?'selected':''}>${l}</option>`).join('')}</select>`;
   appc.appendChild(dk); appc.appendChild(lang);
   lang.querySelector('select').onchange=e=>{S.settings.lang=e.target.value;save();toast('Saved (UI strings stay English in this build)');};
